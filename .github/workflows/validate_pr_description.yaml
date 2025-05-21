@@ -1,0 +1,61 @@
+name: Validate PR metadata
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize]
+
+jobs:
+  validate-description:
+    if: startsWith(github.head_ref, 'feature/')
+    name: Validate PR description
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set variables
+        id: vars
+        run: |
+          SOURCE_BRANCH="${{ github.head_ref }}"
+          COMMIT_SHA="${{ github.event.pull_request.head.sha }}"
+          TEMPLATE_PATH=".github/pull_request_template.md"
+
+          echo "SOURCE_BRANCH=$SOURCE_BRANCH" >> "$GITHUB_ENV"
+          echo "COMMIT_SHA=$COMMIT_SHA" >> "$GITHUB_ENV"
+          echo "TEMPLATE_PATH=$TEMPLATE_PATH" >> "$GITHUB_ENV"
+
+      - name: Fetch PR template from GitHub API
+        run: |
+          echo "Fetching template from commit $COMMIT_SHA at path $TEMPLATE_PATH"
+
+          curl -s -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+               -H "Accept: application/vnd.github.v3.raw" \
+               "https://api.github.com/repos/${{ github.repository }}/contents/${TEMPLATE_PATH}?ref=${COMMIT_SHA}" \
+               -o pr_template.txt
+
+      - name: Check if PR has a description
+        run: |
+          echo "Checking PR description..."
+          PR_BODY=$(jq --raw-output ".pull_request.body // empty" "$GITHUB_EVENT_PATH")
+          echo "PR Body: '$PR_BODY'"
+          if [ -z "$PR_BODY" ]; then
+            echo "ERROR: The PR does not contain a description."
+            exit 1
+          fi
+
+      - name: Compare PR Description and Template
+        run: |
+          PR_BODY=$(jq --raw-output ".pull_request.body // empty" "$GITHUB_EVENT_PATH")
+          echo "$PR_BODY" > pr_body.txt
+
+          # Normalize both files: trim empty lines, remove whitespace-only lines
+          sed '/^\s*$/d' pr_body.txt | sed 's/[[:space:]]//g' > pr_body_clean.txt
+          sed '/^\s*$/d' pr_template.txt | sed 's/[[:space:]]//g' > pr_template_clean.txt
+
+          if cmp -s pr_body_clean.txt pr_template_clean.txt; then
+              echo "ERROR: PR description matches the template too closely. Please provide a meaningful description."
+              exit 1
+          else
+              echo "PR description differs sufficiently from the template."
+          fi
+
+      - name: Ensure all checkboxes are checked
+        uses: mheap/require-checklist-action@v2

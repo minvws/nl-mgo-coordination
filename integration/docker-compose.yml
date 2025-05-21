@@ -1,0 +1,203 @@
+name: mgo-integration
+services:
+  dvp:
+    build:
+      context: .
+      dockerfile: ./docker/dvp/Dockerfile
+      args:
+        NEW_UID: ${NEW_UID:-1000}
+        NEW_GID: ${NEW_GID:-1000}
+    ports:
+      - 9000:80
+      - '${VITE_PORT:-5173}:${VITE_PORT:-5173}'
+    volumes:
+      - './services/dvp/:/var/www/html'
+      - 'max-secrets:/var/run/secrets'
+    networks:
+      - max-public
+    depends_on:
+      max:
+        condition: service_healthy
+      prs:
+        condition: service_healthy
+
+  dva:
+    build:
+      context: ./
+      dockerfile: docker/dva/Dockerfile
+    environment:
+      - DEV=false
+    volumes:
+      - ./services/dva:/code
+    ports:
+      - 8001:80
+      - 5678:5678
+    networks:
+      - dva-demo
+    depends_on:
+      prs:
+        condition: service_healthy
+
+  max:
+    build:
+      context: ./submodules/max
+      dockerfile: ./docker/Dockerfile
+      args:
+        UID: ${NEW_UID:-1000}
+        GID: ${NEW_GID:-1000}
+        INSTALL_NPM_ASSETS: true
+      secrets:
+        - npmrc
+    volumes:
+      - './submodules/max:/src'
+      - '/src/.venv'
+      - './docker/max/clients.json:/src/clients.json'
+      - './docker/max/login_methods.json:/src/login_methods.json'
+      - './docker/max/max.conf:/src/max.conf'
+      - './docker/max/vad.conf:/src/vad.conf'
+      - '/src/node_modules'
+      - '/src/static/assets'
+      - './docker/max/version.json:/src/static/version.json'
+      - 'max-secrets:/secrets'
+      - 'max-secrets:/src/secrets'
+    depends_on:
+      redis-init:
+        condition: service_completed_successfully
+      secrets-manager:
+        condition: service_completed_successfully
+      brp:
+        condition: service_started
+    ports:
+      - '8006:8006'
+    networks:
+      - max-public
+      - max-internal
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "--insecure", "https://localhost:8006/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+  prs:
+    build:
+      context: ./submodules/prs
+      dockerfile: ./docker/Dockerfile
+      args:
+        NEW_UID: ${NEW_UID:-1000}
+        NEW_GID: ${NEW_GID:-1000}
+    volumes:
+      - './submodules/prs:/src'
+      - ./docker/prs/app.conf:/src/app.conf
+      - 'max-secrets:/var/run/secrets'
+      - 'prs-secrets:/secrets'
+    depends_on:
+      secrets-manager:
+        condition: service_completed_successfully
+      redis:
+        condition: service_started
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "http://localhost:6502/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    ports:
+      - '8005:6502'
+    networks:
+      - max-public
+      - max-internal
+      - dva-demo
+
+  brp:
+    image: ghcr.io/brp-api/personen-mock:2.3.0-latest
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Release
+      - ASPNETCORE_URLS=http://+:5010
+    volumes:
+      - './docker/brp/test-data.json:/app/Data/test-data.json'
+    ports:
+      - "5010:5010"
+    networks:
+      - max-public
+
+  redis:
+    image: redis:6.2
+    restart: 'no'
+    ports:
+      - '6379:6379'
+    networks:
+      - max-internal
+
+  redis-init:
+    depends_on:
+      - redis
+    image: redis:6.2
+    restart: 'no'
+    command: 'redis-cli -h redis set max:primary_identity_provider tvs'
+    networks:
+      - max-internal
+
+  secrets-manager:
+    build:
+      context: ./docker
+      dockerfile: secrets-manager/Dockerfile
+    volumes:
+      - max-secrets:/secrets
+      - prs-secrets:/prs-secrets
+
+  secrets:
+    build:
+      context: ./docker/secrets
+    container_name: apache_secrets
+    depends_on:
+      - secrets-manager
+    volumes:
+      - max-secrets:/usr/local/apache2/htdocs
+      - prs-secrets:/usr/local/apache2/htdocs
+    networks:
+      - max-public
+    ports:
+      - '8007:80'
+
+  dvp-proxy:
+    build:
+      context: ./submodules/dvp-proxy/services/proxy
+      dockerfile: docker/Dockerfile
+      args:
+        NEW_UID: ${NEW_UID:-1000}
+        NEW_GID: ${NEW_GID:-1000}
+    ports:
+      - 8801:8801
+    environment:
+      - APP_PORT=8801
+    volumes:
+      - './submodules/dvp-proxy/services/proxy:/src'
+      - './docker/dvp-proxy/app.conf:/src/app.conf'
+      - 'max-secrets:/src/max-secrets'
+    networks:
+      - max-public
+    depends_on:
+      max:
+        condition: service_healthy
+      secrets-manager:
+        condition: service_completed_successfully
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "http://localhost:8801" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+networks:
+  max-public:
+    driver: bridge
+  max-internal:
+    driver: bridge
+  dva-demo:
+    driver: bridge
+
+volumes:
+  max-secrets:
+  prs-secrets:
+
+
+secrets:
+  npmrc:
+    file: ~/.npmrc

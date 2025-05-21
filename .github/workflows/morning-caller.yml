@@ -1,0 +1,15 @@
+name: Run regression-tests every morning
+on:
+  schedule:
+    - cron: "10 4 * * *"
+  workflow_dispatch:
+
+jobs:
+  morning-run-on-test:
+    uses: ./.github/workflows/called-regression-testing.yml
+    with:
+      test_environment: test
+      test_tag: test
+    secrets:
+      user: ${{secrets.HTACCESS_USER}}
+      password: ${{secrets.HTACCESS_PASSWORD}}

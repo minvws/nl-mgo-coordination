@@ -1,0 +1,12 @@
+[submodule "integration/submodules/prs"]
+	path = integration/submodules/prs
+	url = git@github.com:minvws/gfmodules-prs-private.git
+	branch = main
+[submodule "integration/submodules/max"]
+	path = integration/submodules/max
+	url = git@github.com:minvws/nl-mgo-max-vad-private.git
+	branch = develop
+[submodule "integration/submodules/dvp-proxy"]
+	path = integration/submodules/dvp-proxy
+	url = git@github.com:minvws/nl-mgo-dvp-proxy-private.git
+	branch = develop

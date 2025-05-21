@@ -1,0 +1,69 @@
+name: Local regression testing
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "15 4 * * *"
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - 'regression-tests/**'
+      - 'integration/**'
+  pull_request:
+    types: [ opened, synchronize, reopened ]
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: true
+          token: ${{ secrets.REPO_READ_ONLY_TOKEN }}
+
+      - name: NPM configuration
+        run: |
+          echo "//npm.pkg.github.com/:_authToken=${{ secrets.REPO_READ_ONLY_TOKEN }}" > ~/.npmrc
+
+      - name: Prepare docker-results directory
+        run: |
+          mkdir -p docker-results
+          sudo chmod -R 777 docker-results
+        working-directory: regression-tests
+
+      - name: Build application
+        run: |
+          NEW_UID=$(id -u)
+          NEW_GID=$(id -g)
+          docker compose build \
+            --progress=plain \
+            --build-arg NEW_UID=$NEW_UID \
+            --build-arg NEW_GID=$NEW_GID \
+        env:
+          DOCKER_BUILDKIT: 1
+        working-directory: integration
+
+      - name: Run application
+        env:
+          HTACCESS_USER: ${{secrets.HTACCESS_USER}}
+          HTACCESS_PASSWORD: ${{secrets.HTACCESS_PASSWORD}}
+        run: docker compose up --wait
+        working-directory: integration
+
+      - name: Run Robot Framework Tests
+        env:
+          USER: ${{secrets.HTACCESS_USER}}
+          PASSWORD: ${{secrets.HTACCESS_PASSWORD}}
+          environment: local
+        run: ./runtests-in-docker.sh
+        working-directory: regression-tests
+
+      - name: Test Results on Integration
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: regression-tests/docker-results/

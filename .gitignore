@@ -1,0 +1,6 @@
+.idea/
+output*
+output-local
+output.xml
+log.html
+/regression-tests/results/

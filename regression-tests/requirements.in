@@ -1,0 +1,14 @@
+protobuf
+robotframework==7.2.2
+robotframework-appiumlibrary
+robotframework-assertion-engine
+robotframework-browser==19.5.1
+robotframework-jsonlibrary
+robotframework-pabot
+robotframework-pythonlibcore
+robotframework-requests
+robotframework-robocop
+robotframework-tidy
+ruff
+isort
+beautifulsoup4

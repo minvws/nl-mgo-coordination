@@ -1,0 +1,19 @@
+name: Regression-tests against Test
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: [ "main" ]
+    paths:
+      - 'regression-tests/**'
+  workflow_dispatch:
+
+jobs:
+  regression-on-PR:
+    uses: ./.github/workflows/called-regression-testing.yml
+    with:
+      test_environment: test
+      test_tag: test
+    secrets:
+      user: ${{secrets.HTACCESS_USER}}
+      password: ${{secrets.HTACCESS_PASSWORD}}

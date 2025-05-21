@@ -1,0 +1,32 @@
+{
+    "006fbf34-a80b-4c81-b6e9-593600675fb1": {
+        "name": "vad test client",
+        "external_id": "87654321",
+        "token_endpoint_auth_method": "none",
+        "redirect_uris": [
+            "http://localhost:9000/oidc/login"
+        ],
+        "response_types": [
+            "code"
+        ],
+        "pubkey_type": "RSA",
+        "client_public_key_path": "/secrets/clients/vad-test-client/vad-test-client.pub",
+        "client_authentication_method": "none",
+        "content_type": "application/json"
+    },
+    "e7b8a6f4-8c3e-4f6a-9b8e-3f8b6a7e8c3e": {
+        "name": "dvp proxy client",
+        "external_id": "34004926",
+        "token_endpoint_auth_method": "none",
+        "redirect_uris": [
+            "http://localhost:8801/oidc/callback"
+        ],
+        "response_types": [
+            "code"
+        ],
+        "pubkey_type": "RSA",
+        "client_public_key_path": "/secrets/clients/dvp-proxy-client/dvp-proxy-client.pub",
+        "client_authentication_method": "private_key_jwt",
+        "content_type": "application/json"
+    }
+}

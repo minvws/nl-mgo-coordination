@@ -1,0 +1,3 @@
+* @minvws/nl-rdo-mgo-codeowners
+.github/CODEOWNERS @minvws/irealisatie-operations
+/regression-tests/ @minvws/rdo-robotframework-codeowners

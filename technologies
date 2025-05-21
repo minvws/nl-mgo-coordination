@@ -1,0 +1,84 @@
+### [Localization and Addressing](https://github.com/minvws/nl-mgo-localization-private)
+
+| Tools and Technologies | Local / Development | CI/CD Environment | Testing Environment | Staging Environment |
+| ---------------------- | ------------------- | ----------------- | ------------------- | ------------------- |
+| Python 3.12.4          | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| PostgreSQL 14.12       | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| FastAPI                | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| Uvicorn                | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| Pydantic               | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| SQLAlchemy             | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| mTLS                   | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| Git                    | ✔️                   |                   |                     |                     |
+| Pip                    | ✔️                   | ✔️                 |                     |                     |
+| Poetry                 | ✔️                   | ✔️                 |                     |                     |
+| Docker                 | ✔️                   |                   |                     |                     |
+| Docker compose         | ✔️                   |                   |                     |                     |
+| MyPy                   | ✔️                   | ✔️                 |                     |                     |
+| Ruff                   | ✔️                   | ✔️                 |                     |                     |
+| pytest                 | ✔️                   | ✔️                 |                     |                     |
+| Makefile               | ✔️                   |                   |                     |                     |
+| Bash                   | ✔️                   |                   |                     |                     |
+| Visual Studio Code     | ✔️                   |                   |                     |                     |
+| Postman/Thunder Client | ✔️                   |                   |                     |                     |
+| Github actions         |                     | ✔️                 |                     |                     |
+
+### [DVA Mock server](https://github.com/minvws/nl-mgo-dva-mock-private)
+
+| Tools and Technologies | Local / Development | CI/CD Environment | Testing Environment | Staging Environment |
+| ---------------------- | ------------------- | ----------------- | ------------------- | ------------------- |
+| Python 3.12.4          | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| FastAPI                | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| Uvicorn                | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| Pydantic               | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| mTLS                   | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| StatsD                 | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| Git                    | ✔️                   |                   |                     |                     |
+| Pip                    | ✔️                   | ✔️                 |                     |                     |
+| Poetry                 | ✔️                   | ✔️                 |                     |                     |
+| Docker                 | ✔️                   |                   |                     |                     |
+| Docker compose         | ✔️                   |                   |                     |                     |
+| MyPy                   | ✔️                   | ✔️                 |                     |                     |
+| Ruff                   | ✔️                   | ✔️                 |                     |                     |
+| pytest                 | ✔️                   | ✔️                 |                     |                     |
+| Makefile               | ✔️                   |                   |                     |                     |
+| Bash                   | ✔️                   |                   |                     |                     |
+| Visual Studio Code     | ✔️                   |                   |                     |                     |
+| Postman/Thunder Client | ✔️                   |                   |                     |                     |
+| Github actions         |                     | ✔️                 |                     |                     |
+
+
+### [DVP Proxy](https://github.com/minvws/nl-mgo-dvp-proxy-private)
+
+| Tools and Technologies | Local / Development | CI/CD Environment | Testing Environment | Staging Environment |
+| ---------------------- | ------------------- | ----------------- | ------------------- | ------------------- |
+| Python 3.12.4          | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| FastAPI                | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| Uvicorn                | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| Pydantic               | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| mTLS                   | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| StatsD                 | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| Git                    | ✔️                   |                   |                     |                     |
+| Pip                    | ✔️                   | ✔️                 |                     |                     |
+| Poetry                 | ✔️                   | ✔️                 |                     |                     |
+| Docker                 | ✔️                   |                   |                     |                     |
+| Docker compose         | ✔️                   |                   |                     |                     |
+| MyPy                   | ✔️                   | ✔️                 |                     |                     |
+| Ruff                   | ✔️                   | ✔️                 |                     |                     |
+| pytest                 | ✔️                   | ✔️                 |                     |                     |
+| Makefile               | ✔️                   |                   |                     |                     |
+| Bash                   | ✔️                   |                   |                     |                     |
+| Visual Studio Code     | ✔️                   |                   |                     |                     |
+| Postman/Thunder Client | ✔️                   |                   |                     |                     |
+| Github actions         |                     | ✔️                 |                     |                     |
+
+
+
+### [Grafana and the monitoring stack](https://github.com/minvws/nl-mgo-grafana-private)
+
+| Tools and Technologies | Local / Development | CI/CD Environment | Testing Environment | Staging Environment |
+| ---------------------- | ------------------- | ----------------- | ------------------- | ------------------- |
+| Grafana                | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| Carbon                 | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| Graphite               | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
+| StatsD                 | ✔️                   | ✔️                 | ✔️                   | ✔️                   |
