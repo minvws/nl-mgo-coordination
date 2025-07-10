@@ -1,3 +1,5 @@
 * @minvws/nl-rdo-mgo-codeowners
-.github/CODEOWNERS @minvws/irealisatie-operations
 /regression-tests/ @minvws/rdo-robotframework-codeowners
+/integration/submodules @minvws/rdo-robotframework-codeowners
+# Last match takes precedence
+.github/CODEOWNERS @minvws/irealisatie-operations

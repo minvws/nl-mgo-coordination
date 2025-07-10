@@ -27,7 +27,7 @@ Auth Session in VAD POC
 
 Extract User's Information
     [Documentation]    OIDC, follow redirects and get encrypted user info
-    [Tags]    test
+    [Tags]    test    acc
     Given the user makes a call to the OIDC-start
     And The user follows the authorization url
     Then the user should see their information in the callback url
@@ -41,7 +41,7 @@ Cookie is expired
 *** Keywords ***
 Setup
     ${list}    Create List    --disable-web-security    --allow-running-insecure-content    --ignore-certificate-errors
-    New Browser    ${BROWSER}    args=${list}
+    New Browser    ${BROWSER}    args=${list}    slowMo=1
     New Context    ignoreHTTPSErrors=True
 
 ## Auth Session in VAD POC
@@ -178,9 +178,11 @@ The cookie should be expired
 
 the user makes a call to the OIDC-start
     [Tags]    secrets
+    ${auth}    Evaluate    ("${USER}", "${PASSWORD}")
     ${response}    POST
-    ...    http://${basicAuth_dvp_proxy}/oidc/start
+    ...    http://${dvp_proxy}/oidc/start
     ...    data={"client_callback_url":"https://${dummy_domain}/oidc/userinfo/callback"}
+    ...    auth=${auth}
     Status Should Be    200    ${response}    msg=POST to /oidc/start failed Reason:\t${response.text}
     ${authorization_URL}    Replace String    ${response.json()['authz_url']}    https://max:8006    ${max}
     VAR    ${authorization_URL}    ${authorization_URL}    scope=SUITE

@@ -1,4 +1,4 @@
-name: Regression-tests against Test
+name: Regression-tests against Test & Acceptance
 on:
   pull_request:
     types: [opened, synchronize, reopened]
@@ -9,11 +9,20 @@ on:
   workflow_dispatch:
 
 jobs:
-  regression-on-PR:
+  run-tests-against-test:
     uses: ./.github/workflows/called-regression-testing.yml
     with:
       test_environment: test
       test_tag: test
+    secrets:
+      user: ${{secrets.HTACCESS_USER}}
+      password: ${{secrets.HTACCESS_PASSWORD}}
+
+  run-tests-against-acc:
+    uses: ./.github/workflows/called-regression-testing.yml
+    with:
+      test_environment: acc
+      test_tag: acc
     secrets:
       user: ${{secrets.HTACCESS_USER}}
       password: ${{secrets.HTACCESS_PASSWORD}}

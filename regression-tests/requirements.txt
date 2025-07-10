@@ -25,18 +25,18 @@ click==8.1.8
     #   rich-click
     #   robotframework-browser
     #   robotframework-tidy
-    #   typer
+    #   typer-slim
 colorama==0.4.6
     # via robotframework-tidy
 decorator==5.2.1
     # via robotframework-appiumlibrary
 docutils==0.21.2
     # via robotframework-appiumlibrary
-grpcio==1.71.0
+grpcio==1.73.0
     # via
     #   grpcio-tools
     #   robotframework-browser
-grpcio-tools==1.71.0
+grpcio-tools==1.73.0
     # via robotframework-browser
 h11==0.16.0
     # via wsproto
@@ -82,7 +82,7 @@ platformdirs==4.3.7
     # via robotframework-robocop
 ply==3.11
     # via jsonpath-ng
-protobuf==5.29.3
+protobuf==6.31.1
     # via
     #   -r requirements.in
     #   grpcio-tools
@@ -97,15 +97,15 @@ referencing==0.36.2
     # via
     #   jsonschema
     #   jsonschema-specifications
-requests==2.32.3
+requests==2.32.4
     # via robotframework-requests
 rich==13.9.4
     # via
     #   rich-click
-    #   typer
+    #   robotframework-robocop
 rich-click==1.8.5
     # via robotframework-tidy
-robotframework==7.2.2
+robotframework==7.3.1
     # via
     #   -r requirements.in
     #   robotframework-appiumlibrary
@@ -123,7 +123,7 @@ robotframework-assertion-engine==3.0.3
     # via
     #   -r requirements.in
     #   robotframework-browser
-robotframework-browser==19.5.1
+robotframework-browser==19.6.0
     # via -r requirements.in
 robotframework-jsonlibrary==0.5
     # via -r requirements.in
@@ -136,17 +136,17 @@ robotframework-pythonlibcore==4.4.1
     #   robotframework-browser
 robotframework-requests==0.9.7
     # via -r requirements.in
-robotframework-robocop==6.1.1
+robotframework-robocop==6.5.0
     # via -r requirements.in
 robotframework-stacktrace==0.4.1
     # via robotframework-pabot
-robotframework-tidy==4.16.0
+robotframework-tidy==4.17.0
     # via -r requirements.in
 rpds-py==0.23.1
     # via
     #   jsonschema
     #   referencing
-ruff==0.11.9
+ruff==0.12.0
     # via -r requirements.in
 seedir==0.5.0
     # via robotframework-browser
@@ -154,8 +154,6 @@ selenium==4.16.0
     # via
     #   appium-python-client
     #   robotframework-appiumlibrary
-shellingham==1.5.4
-    # via typer
 six==1.17.0
     # via robotframework-appiumlibrary
 sniffio==1.3.1
@@ -174,14 +172,14 @@ trio==0.29.0
     #   trio-websocket
 trio-websocket==0.12.2
     # via selenium
-typer==0.15.3
+typer-slim==0.16.0
     # via robotframework-robocop
 typing-extensions==4.12.2
     # via
     #   beautifulsoup4
     #   referencing
     #   rich-click
-    #   typer
+    #   typer-slim
 urllib3[socks]==2.3.0
     # via
     #   requests

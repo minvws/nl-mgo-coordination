@@ -1,9 +1,6 @@
 #!/bin/bash
-if [ ! -d "/var/www/html/vendor" ]; then
-    composer install --optimize-autoloader --no-dev
-    echo "Installed composer dependencies ✔"
-fi
-
+composer install --optimize-autoloader --no-dev
+echo "Installed composer dependencies ✔"
 
 if [ ! -f "database/database.sqlite" ]; then
     touch database/database.sqlite && chmod ug+w database/database.sqlite

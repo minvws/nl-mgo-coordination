@@ -3,7 +3,6 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Auth\OidcLoginController;
 use App\Http\Controllers\RidController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,5 +27,3 @@ Route::post('logout', function () {
 Route::post('rid/exchange', [RidController::class, 'exchange'])->name('rid.exchange');
 
 Route::get('profile', [AuthController::class, 'profile'])->name('profile');
-
-Route::get('oidc/login', OidcLoginController::class)->name('oidc.login');

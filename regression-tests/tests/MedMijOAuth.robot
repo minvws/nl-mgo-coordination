@@ -9,7 +9,7 @@ Resource            ../resources/globalResources.resource
 Suite Setup         Setup
 Suite Teardown      Close Browser
 
-Test Tags           dvp    test
+Test Tags           dvp    test    acc
 
 
 *** Test Cases ***
@@ -26,7 +26,7 @@ Obtain access token from MedMij
 *** Keywords ***
 Setup
     [Documentation]    First open the Browser in order to initiate a session with the BasicAuth
-    [Tags]  secrets
+    [Tags]    secrets
     Log To Console    ${BROWSER}
 
     New Browser    ${BROWSER}

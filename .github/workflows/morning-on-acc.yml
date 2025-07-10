@@ -1,15 +1,16 @@
-name: Run regression-tests every morning
+name: Morning Run against Acc environment
 on:
   schedule:
-    - cron: "10 4 * * *"
+    - cron: "20 4 * * *"
   workflow_dispatch:
 
 jobs:
   morning-run-on-test:
     uses: ./.github/workflows/called-regression-testing.yml
     with:
-      test_environment: test
-      test_tag: test
+      test_environment: acc
+      test_tag: acc
     secrets:
       user: ${{secrets.HTACCESS_USER}}
       password: ${{secrets.HTACCESS_PASSWORD}}
+

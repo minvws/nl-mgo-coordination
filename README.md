@@ -28,6 +28,7 @@ and contribute to the tests, please read further in the [README under regression
 # Regression Tests Runs
 | Nightly Test Run                   | Status                                             |
 |------------------------------------|----------------------------------------------------|
-| Test Run against Test env          | [![Run regression-tests every morning](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/morning-caller.yml/badge.svg)](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/morning-caller.yml) |
+| Test Run against Test env          | [![Morning Run against Test environment](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/morning-on-test.yml/badge.svg?branch=develop)](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/morning-on-test.yml) |
+| Test Run against Acc env           | [![Morning Run against Acc environment](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/morning-on-acc.yml/badge.svg?branch=develop)](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/morning-on-acc.yml) |
 | Test Run on integration on develop | [![Regression Testing on Integration](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/local-regression-testing.yml/badge.svg)](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/local-regression-testing.yml) |
 | Test Run on integration on main    | [![Regression Testing on Integration](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/local-regression-testing.yml/badge.svg?branch=main)](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/local-regression-testing.yml) |

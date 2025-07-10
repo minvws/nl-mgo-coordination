@@ -6,5 +6,5 @@ Library             Collections
 Library             String
 Library             Browser
 Library             RequestsLibrary
-Library             extended_collections.py
+Library             ../libs/extended_collections.py
 Library             re

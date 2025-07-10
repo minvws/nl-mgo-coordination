@@ -4,7 +4,7 @@ on:
     inputs:
       test_environment:
         type: string
-        description: Against which env to run the tests test, local
+        description: Against which env to run the tests test, local, acc
         required: true
       test_path:
         type: string
@@ -41,11 +41,11 @@ jobs:
           pip install -r regression-tests/requirements.txt
           rfbrowser init
 
-      - name: Run Chrome Tests on Test
+      - name: Run Chrome Tests against Environment
         run: |
           cd regression-tests
           export environment=${{ inputs.test_environment }}
-          robot --removekeywords name:Setup --removekeywords tag:secrets --loglevel TRACE:INFO --outputdir=./results -v USER:${{secrets.user}} -v PASSWORD:${{secrets.password}} -v BROWSER:chromium -i ${{ inputs.test_tag }} -e local tests/*
+          robot --removekeywords name:Setup --removekeywords tag:secrets --loglevel TRACE:INFO --outputdir=./results -v USER:${{secrets.user}} -v PASSWORD:${{secrets.password}} -v BROWSER:chromium -i ${{ inputs.test_tag }} tests/*
           rebot --removekeywords tag:secrets --output results/final_output.xml results/output.xml
           mv results/final_output.xml results/output.xml
 
@@ -53,7 +53,7 @@ jobs:
         uses: actions/upload-artifact@v4.3.1
         if: ${{ always() }}
         with:
-          name: regression-tests-results-chrome
+          name: regression-tests-results-chrome-${{ inputs.test_environment }}
           path: regression-tests/results/
 
       - name: Publish Chrome results summary to GitHub

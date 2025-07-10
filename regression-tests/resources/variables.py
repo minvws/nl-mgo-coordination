@@ -18,6 +18,13 @@ global_variables["test"] = {
     "user_name": "Jan van Jansen",
 }
 
+global_variables["acc"] = {
+    "dvp_proxy": "dvp-proxy.acc.mgo.irealisatie.nl",
+    "host": "http://localhost:9000",  # VAD_POC is not yet on Acc env
+    "max": "https://vad.acc.mgo.irealisatie.nl",
+    "load": "lo-ad.acc.mgo.irealisatie.nl",
+    "user_name": "Jan van Jansen",
+}
 
 
 def get_variables():
@@ -27,6 +34,8 @@ def get_variables():
     """
 
     print(f"Function::environment {os.environ['environment']}")
-    gv = global_variables.get(os.environ['environment'], global_variables["local"])
-    print(f"Function::dvp_proxy {global_variables[os.environ['environment']]['dvp_proxy']}", )
+    gv = global_variables.get(os.environ["environment"], global_variables["local"])
+    print(
+        f"Function::dvp_proxy {global_variables[os.environ['environment']]['dvp_proxy']}",
+    )
     return gv
