@@ -9,7 +9,7 @@ Resource            ../resources/globalResources.resource
 Suite Setup         Setup
 Suite Teardown      Close Browser
 
-Test Tags           dvp    test    acc
+Test Tags           dvp    local    test    acc
 
 
 *** Test Cases ***
@@ -27,18 +27,26 @@ Obtain access token from MedMij
 Setup
     [Documentation]    First open the Browser in order to initiate a session with the BasicAuth
     [Tags]    secrets
-    Log To Console    ${BROWSER}
 
+    Log To Console    ${BROWSER}
     New Browser    ${BROWSER}
-    New Page    https://${basicAuth_dvp_proxy}
-    New Page    https://${basicAuth_load}
+
+    IF    '%{ENVIRONMENT}' == 'local'
+        New Page    http://${dvp_proxy}
+        New Page    http://${load}
+    ELSE
+        New Page    https://${USER}:${PASSWORD}@${dvp_proxy}
+        New Page    https://${USER}:${PASSWORD}@${load}
+    END
 
 we retrieve the signed urls from load
     [Documentation]    make POST request to get all the organizations from Lo-ad
     [Tags]    secrets
+    ${auth}    Evaluate    ("${USER}", "${PASSWORD}")
     ${response}    POST
-    ...    https://${basicAuth_load}/localization/organization/search
+    ...    http://${load}/localization/organization/search
     ...    {"name":"test","city":"test"}
+    ...    auth=${auth}
     Status Should Be
     ...    200
     ...    ${response}
@@ -58,46 +66,29 @@ we check that each ZorgAanbieder has 1 gegevensdienst
     [Documentation]    Iterate through the organizations from Lo-ad
     ...    and check that the Medmij Zorgaanbieders have only 1 data_service
 
-    # Kwalificatie Medmij: BGZ
-    ${Medmij_BGZ}    Filter from list for a given condition dict
+    Validate Medmij Org Has One Data Service    ${organizations}    Kwalificatie Medmij: BGZ
+    Validate Medmij Org Has One Data Service    ${organizations}    Kwalificatie Medmij: PDFA
+    Validate Medmij Org Has One Data Service
     ...    ${organizations}
-    ...    {"display_name": "Kwalificatie Medmij: BGZ"}
+    ...    Kwalificatie Medmij: VACCINATION_IMMUNIZATION
+    Validate Medmij Org Has One Data Service    ${organizations}    Kwalificatie Medmij: GPDATA
 
-    ${count}    Get Length    ${Medmij_BGZ[0]["data_services"]}
-    Should Be Equal As Integers    ${count}    1
-
-    # Kwalificatie Medmij: PDFA
-    ${Medmij_PDFA}    Filter from list for a given condition dict
+Validate Medmij Org Has One Data Service
+    [Documentation]    Use custom keyword to filter out a dictionary for a specific organization
+    [Arguments]    ${organizations}    ${zorgaanbieder}
+    ${filtered}    Filter from list for a given condition dict
     ...    ${organizations}
-    ...    {"display_name": "Kwalificatie Medmij: PDFA"}
-
-    ${count}    Get Length    ${Medmij_PDFA[0]["data_services"]}
-    Should Be Equal As Integers    ${count}    1
-
-    # Kwalificatie Medmij: VACCINATION_IMMUNIZATION
-    ${Medmij_vaccin_immun}    Filter from list for a given condition dict
-    ...    ${organizations}
-    ...    {"display_name": "Kwalificatie Medmij: VACCINATION_IMMUNIZATION"}
-
-    ${count}    Get Length    ${Medmij_vaccin_immun[0]["data_services"]}
-    Should Be Equal As Integers    ${count}    1
-
-    # Kwalificatie Medmij: GPDATA
-    ${Medmij_GPDATA}    Filter from list for a given condition dict
-    ...    ${organizations}
-    ...    {"display_name": "Kwalificatie Medmij: GPDATA"}
-
-    ${count}    Get Length    ${Medmij_GPDATA[0]["data_services"]}
+    ...    {"display_name": "${zorgaanbieder}"}
+    ${count}    Get Length    ${filtered[0]["data_services"]}
     Should Be Equal As Integers    ${count}    1
 
 the client does a POST request to the getstate endpoint
     [Documentation]    POST to /getstate and get the url_to_request
-    [Tags]    secrets
     ${medmij_scope}    Set Variable    medmij.ontwikkel.verplicht.interoplab
     ${client_target_url}    Set Variable    https://client.example.com/callback
 
     ${response}    POST
-    ...    https://${basicAuth_dvp_proxy}/getstate
+    ...    http://${dvp_proxy}/getstate
     ...    data={"authorization_server_url":"${authorization_server_url}","token_endpoint_url":"${token_endpoint_url}","medmij_scope":"${medmij_scope}","client_target_url":"${client_target_url}"}
     Status Should Be    200    ${response}    msg=POST to /getstate failed Reason:\t${response.text}
     log    ${response.json()}

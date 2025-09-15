@@ -1,0 +1,31 @@
+[project]
+name = "mgo-coordination-regression-tests"
+version = "0.1.0"
+description = "Regression tests for MGO coordination repo"
+authors = [
+    {name = "Rein van der Vegt",email = "ren.vegt@gmail.com"}
+]
+readme = "README.md"
+requires-python = ">=3.12,<4.0"
+
+[tool.poetry]
+package-mode = false
+
+[tool.poetry.dependencies]
+robotframework-appiumlibrary = ">=2.1.0,<3.0.0"
+robotframework-assertion-engine = ">=3.0.3,<4.0.0"
+robotframework-browser = "==19.7.0"
+robotframework-jsonlibrary = ">=0.5,<0.6"
+robotframework-pythonlibcore = ">=4.4.1,<5.0.0"
+robotframework-requests = ">=0.9.7,<0.10.0"
+robotframework-robocop = ">=6.5.0,<7.0.0"
+robotframework-tidy = ">=4.18.0,<5.0.0"
+protobuf = "^6.31.1"
+ruff = "^0.12.9"
+isort = "^6.0.1"
+beautifulsoup4 = "^4.13.4"
+python-dotenv = "^1.1.1"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

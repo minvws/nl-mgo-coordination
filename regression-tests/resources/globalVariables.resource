@@ -5,5 +5,5 @@ Variables           variables.py
 
 
 *** Variables ***
-${basicAuth_load}           ${USER}:${PASSWORD}@${load}
-${basicAuth_dvp_proxy}      ${USER}:${PASSWORD}@${dvp_proxy}
+${USER}    %{HTACCESS_USER}
+${PASSWORD}    %{HTACCESS_PASSWORD}

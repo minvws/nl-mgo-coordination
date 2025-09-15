@@ -20,7 +20,6 @@ services:
         condition: service_healthy
       prs:
         condition: service_healthy
-
   dva:
     build:
       context: ./
@@ -37,7 +36,6 @@ services:
     depends_on:
       prs:
         condition: service_healthy
-
   max:
     build:
       context: ./submodules/max
@@ -53,8 +51,8 @@ services:
       - '/src/.venv'
       - './docker/max/clients.json:/src/clients.json'
       - './docker/max/login_methods.json:/src/login_methods.json'
-      - './docker/max/max.conf:/src/max.conf'
-      - './docker/max/vad.conf:/src/vad.conf'
+      - './docker/max/max.conf.example:/src/max.conf'
+      - './docker/max/vad.conf.example:/src/vad.conf'
       - '/src/node_modules'
       - '/src/static/assets'
       - './docker/max/version.json:/src/static/version.json'
@@ -105,7 +103,6 @@ services:
       - max-public
       - max-internal
       - dva-demo
-
   brp:
     image: ghcr.io/brp-api/personen-mock:2.3.0-latest
     environment:
@@ -117,7 +114,6 @@ services:
       - "5010:5010"
     networks:
       - max-public
-
   redis:
     image: redis:6.2
     restart: 'no'
@@ -125,7 +121,6 @@ services:
       - '6379:6379'
     networks:
       - max-internal
-
   redis-init:
     depends_on:
       - redis
@@ -134,7 +129,6 @@ services:
     command: 'redis-cli -h redis set max:primary_identity_provider tvs'
     networks:
       - max-internal
-
   secrets-manager:
     build:
       context: ./docker
@@ -142,7 +136,6 @@ services:
     volumes:
       - max-secrets:/secrets
       - prs-secrets:/prs-secrets
-
   secrets:
     build:
       context: ./docker/secrets
@@ -156,7 +149,6 @@ services:
       - max-public
     ports:
       - '8007:80'
-
   dvp-proxy:
     build:
       context: ./submodules/dvp-proxy/services/proxy
@@ -185,6 +177,55 @@ services:
       timeout: 5s
       retries: 3
 
+  load:
+    depends_on:
+      postgres:
+        condition: service_healthy
+    build:
+      context: ./submodules/load
+      dockerfile: Dockerfile
+      args:
+        NEW_UID: ${NEW_UID:-1000}
+        NEW_GID: ${NEW_GID:-1000}
+    ports:
+      - 8808:8006    
+    volumes:
+      - './submodules/load:/src'
+      - './scripts/load/healthcheck.py:/var/run/healthcheck.py'
+    networks:
+      - load
+    healthcheck:
+      test: ["CMD", "python3", "/var/run/healthcheck.py"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      
+
+  postgres:
+    image: postgres:14.10-bookworm
+    environment:
+        - POSTGRES_USER=postgres
+        - POSTGRES_PASSWORD=postgres
+        - POSTGRES_DB=lo_ad_db
+    ports:
+        - 5432:5432
+    volumes:
+        - postgres_data:/var/lib/postgresql/data
+    networks:
+      load:
+        aliases:
+          - postgresql
+          - database
+    security_opt:
+        - no-new-privileges:true
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      retries: 5
+      start_period: 30s
+      timeout: 10s
+
+      
 networks:
   max-public:
     driver: bridge
@@ -192,11 +233,13 @@ networks:
     driver: bridge
   dva-demo:
     driver: bridge
+  load:
+    driver: bridge
 
 volumes:
   max-secrets:
   prs-secrets:
-
+  postgres_data:
 
 secrets:
   npmrc:

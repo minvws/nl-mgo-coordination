@@ -41,6 +41,8 @@ Cookie is expired
 *** Keywords ***
 Setup
     ${list}    Create List    --disable-web-security    --allow-running-insecure-content    --ignore-certificate-errors
+    Log To Console    %{ENVIRONMENT}
+    Log To Console    ${BROWSER}
     New Browser    ${BROWSER}    args=${list}    slowMo=1
     New Context    ignoreHTTPSErrors=True
 
@@ -66,10 +68,10 @@ the user follows up on the login steps
     VAR    ${GET_authorize_request}    ${GET_authorize_request}    scope=SUITE
 
     Get Url    *=    ${max}/digid-mock
-    Get Text    h1    contains    DigiD MOCK
+    Get Text    h1    contains    DigiD Mock
     Get Element    css=form[method="GET"] [id="bsn_inp"]
 
-    Click    css=a#submit_two    # Login/Submit
+    Click    css=button[type="submit"]    # Login/Submit
 
 the user can fill in the User Profile form
     [Documentation]    Fill in the Form
@@ -117,7 +119,7 @@ The cookie is renewed with new expiry date
     ...    httpOnly=True
     ...    secure=True
     ${response}    POST
-    ...    ${max}/auth/session/renew
+    ...    https://${max}/auth/session/renew
     ...    verify=${False}
     ...    cookies=${cookie}
     Status Should Be    204    ${response}    msg=POST to max/auth/session/renew failed Reason:\t${response.text}
@@ -184,7 +186,7 @@ the user makes a call to the OIDC-start
     ...    data={"client_callback_url":"https://${dummy_domain}/oidc/userinfo/callback"}
     ...    auth=${auth}
     Status Should Be    200    ${response}    msg=POST to /oidc/start failed Reason:\t${response.text}
-    ${authorization_URL}    Replace String    ${response.json()['authz_url']}    https://max:8006    ${max}
+    ${authorization_URL}    Replace String    ${response.json()['authz_url']}    https://max:8006    https://${max}
     VAR    ${authorization_URL}    ${authorization_URL}    scope=SUITE
 
 The user follows the authorization url
@@ -195,10 +197,18 @@ The user follows the authorization url
     ...    --disable-features=IsolateOrigins,site-per-process
     New Browser    ${BROWSER}    args=${list}
     New Page    ${authorization_URL}
-    ${href_value}    Get Attribute    css=a#submit_two    href
-    ${href_value}    catenate    SEPARATOR=/    ${max}    ${href_value}
 
-    ${final_url}    Follow Redirects    ${href_value}    userinfo=
+    # Assemble the URL to follow up on
+    ${action}    Get Attribute    form    action
+
+    ${bsn}    Get Property    input[name="bsn"]    value
+    ${samlart}    Get Property    input[name="SAMLart"]    value
+    ${relay}    Get Property    input[name="RelayState"]    value
+
+    ${url_to_follow}    Set Variable    https://${max}/${action}?bsn=${bsn}&SAMLart=${samlart}&RelayState=${relay}
+    Log    ${url_to_follow}
+
+    ${final_url}    Follow Redirects    ${url_to_follow}    userinfo=
 
     # Log the entire redirect chain
     Log    Redirect final url: ${final_url}
@@ -228,5 +238,5 @@ Decode Base64 String
 
 the user can logout
     # Logout
-    Click    css=form[action="${host}/logout"] button[type="submit"]
+    Click    css=form[action="http://${host}/logout"] button[type="submit"]
     Get Text    h2    contains    Login

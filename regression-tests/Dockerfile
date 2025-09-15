@@ -3,7 +3,9 @@ FROM marketsquare/robotframework-browser:19.1
 WORKDIR /home/pwuser
 
 COPY . /home/pwuser
-RUN pip install -r requirements.txt
+RUN pip install poetry && \
+    poetry install && \
+    .venv/bin/rfbrowser init
 
 USER root
 RUN mkdir -p results && \

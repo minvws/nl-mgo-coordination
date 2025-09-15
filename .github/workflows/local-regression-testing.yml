@@ -27,7 +27,7 @@ jobs:
       - name: NPM configuration
         run: |
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.REPO_READ_ONLY_TOKEN }}" > ~/.npmrc
-
+          
       - name: Prepare docker-results directory
         run: |
           mkdir -p docker-results
@@ -36,34 +36,38 @@ jobs:
 
       - name: Build application
         run: |
-          NEW_UID=$(id -u)
-          NEW_GID=$(id -g)
-          docker compose build \
-            --progress=plain \
-            --build-arg NEW_UID=$NEW_UID \
-            --build-arg NEW_GID=$NEW_GID \
-        env:
-          DOCKER_BUILDKIT: 1
+          make NEW_GID=$(id -g) NEW_UID=$(id -u) BUILD_PROGRESS=plain build
         working-directory: integration
 
       - name: Run application
         env:
           HTACCESS_USER: ${{secrets.HTACCESS_USER}}
           HTACCESS_PASSWORD: ${{secrets.HTACCESS_PASSWORD}}
-        run: docker compose up --wait
+        run: make start
         working-directory: integration
 
       - name: Run Robot Framework Tests
         env:
-          USER: ${{secrets.HTACCESS_USER}}
-          PASSWORD: ${{secrets.HTACCESS_PASSWORD}}
-          environment: local
+          HTACCESS_USER: ${{secrets.HTACCESS_USER}}
+          HTACCESS_PASSWORD: ${{secrets.HTACCESS_PASSWORD}}
+          ENVIRONMENT: local
         run: ./runtests-in-docker.sh
         working-directory: regression-tests
 
+      - name: Collect Docker Logs on Failure
+        if: failure() && endsWith(github.repository, '-private')
+        run: docker compose logs --timestamps
+        working-directory: integration
+          
       - name: Test Results on Integration
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: integration-test-results
           path: regression-tests/docker-results/
+
+      - name: Publish Chrome results summary to GitHub
+        uses: minvws/nl-rdo-github-action-robotframework-test-summary@0.4.3
+        if: always()
+        with:
+          output_file: 'regression-tests/docker-results/output.xml'

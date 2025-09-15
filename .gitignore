@@ -4,3 +4,5 @@ output-local
 output.xml
 log.html
 /regression-tests/results/
+*.pyc
+.venv

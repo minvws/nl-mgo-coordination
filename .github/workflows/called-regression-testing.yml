@@ -9,7 +9,7 @@ on:
       test_path:
         type: string
         description: Run specific suite
-        default: regression-tests/tests
+        default: tests
       test_tag:
         type: string
         description: Run test with specific Tag
@@ -32,22 +32,40 @@ jobs:
       - name: Setup Python
         uses: actions/setup-python@v5.6.0
         with:
-          python-version: 3.12.6
+          python-version: 3.13.5
 
       - name: Setup Workspace
+        working-directory: regression-tests
         run: |
-          sudo npx playwright install-deps
-          python -m pip install --upgrade pip
-          pip install -r regression-tests/requirements.txt
-          rfbrowser init
+          python -m pip install --upgrade pip poetry
+          poetry install
+          poetry run rfbrowser init
 
       - name: Run Chrome Tests against Environment
+        working-directory: regression-tests
         run: |
-          cd regression-tests
-          export environment=${{ inputs.test_environment }}
-          robot --removekeywords name:Setup --removekeywords tag:secrets --loglevel TRACE:INFO --outputdir=./results -v USER:${{secrets.user}} -v PASSWORD:${{secrets.password}} -v BROWSER:chromium -i ${{ inputs.test_tag }} tests/*
-          rebot --removekeywords tag:secrets --output results/final_output.xml results/output.xml
-          mv results/final_output.xml results/output.xml
+            touch .env
+            echo "HTACCESS_USER=${{ secrets.user }}" >> .env
+            echo "HTACCESS_PASSWORD=${{ secrets.password }}" >> .env
+            echo "ENVIRONMENT=${{ inputs.test_environment }}" >> .env
+          
+            export ENVIRONMENT=${{ inputs.test_environment }}
+            poetry run robot \
+            --removekeywords tag:secrets \
+            --loglevel TRACE:INFO \
+            --outputdir=./results \
+            -v BROWSER:chromium \
+            -v USER:${{ secrets.user }} \
+            -v PASSWORD:${{ secrets.password }} \
+            -v ENVIRONMENT:${{ inputs.test_environment }} \
+            -i "${{ inputs.test_tag }}" \
+            ${{ inputs.test_path }}/*
+          
+            poetry run rebot \
+              --removekeywords tag:secrets \
+              --output results/final_output.xml \
+              results/output.xml
+            mv results/final_output.xml results/output.xml
 
       - name: Upload Test Report Chrome
         uses: actions/upload-artifact@v4.3.1
@@ -57,7 +75,7 @@ jobs:
           path: regression-tests/results/
 
       - name: Publish Chrome results summary to GitHub
-        uses: minvws/nl-rdo-github-action-robotframework-test-summary@v0.4.1
+        uses: minvws/nl-rdo-github-action-robotframework-test-summary@0.4.3
         if: always()
         with:
           output_file: 'regression-tests/results/output.xml'

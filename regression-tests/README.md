@@ -16,27 +16,36 @@ your environment.
 
 # Environment setup
 1. Clone the repository [nl-mgo-coordination-private](https://github.com/minvws/nl-mgo-coordination-private) from Github
-2. Install Python 3.12 on your machine and then install `pip`.
-
-   ```python3.12 -m pip install --upgrade pip```
-3. Start a new virtual environment on the root folder of this project, using Python 3.12, and activate it.
+2. Install Python 3.13 on your machine and then install `pip`.
 
    ```bash
-   pip install virtualenv
-   virtualenv venv
-   source venv/bin/activate
+   python3.13.5 -m pip install --upgrade pip
    ```
-4. First tool to install would be the [`pip-tools`](https://github.com/jazzband/pip-tools).
-   A set of command line tools to help you keep your pip-based packages fresh, even when you've pinned them.
-   This way we can have the essential packages for this project pinned in the `requirements.in` and with that we can construct the
-   `requirements.txt` file that should be used when installing packages. When you want to update some packages,
-   all you need to do is update the `requirements.in` file and then re-compile the `requirements.txt` one.
-   So do `python -m pip install pip-tools` inside your activated pip environment.
-   When you need to compile a new version of the `requirements.txt`, do `pip-compile --output-file=- > requirements.txt`
-   inside the `regression-tests` folder.
-5. Install the pip libraries required:
+3. You can either use the Makefile to install all the needed dependencies, or follow the steps below.
+Using the Makefile would be like this:
    ```bash
-   pip3 install -r regression-tests/requirements.txt
+   make install-robot
    ```
-6. Run `rfbrowser init` in order to initialize the Browser library with new node dependencies
-7. Execute the tests using the `regression-tests/runtests.sh` script
+If you choose to install the dependencies manually, see the following steps:
+   1. For the regression-tests, we are using [`poetry`](https://github.com/python-poetry/poetry) as the main dependency management tool.
+      Given you are in the `regression-tests` directory, do:
+      ```bash
+      pip3 install poetry
+      ```
+   2. Use poetry to create a new virtual environment `.venv` and install the dependencies inside it:
+      ```bash
+      poetry install
+      eval $(poetry env activate)
+      ```
+      Should you need to add more packages to your project, you can easily do that with `poetry add PACKAGE`.
+      This way poetry adds the package to your `pyproject.toml` and the `poetry.lock` files.
+      You can update packages using `poetry update`, followed up by `poetry lock`.
+
+   3. Once you have the virtual environment activated, do `rfbrowser init` in order to initialize the Browser library with new node dependencies
+   4. Copy the content of the `regression-tests/.env.example` to a `.env` file and add the credentials.
+   5. Finally, execute the tests using the `regression-tests/runtests.sh` script to run them with `robot` directly on your machine 
+   or use the make target: `make test`. 
+   `make test` will run the tests locally, unless amended on the .env file. Alternatively, you can override the .env setting
+   with `make test environment=test`.
+
+Keep calm and Robot Framework on 🤖!

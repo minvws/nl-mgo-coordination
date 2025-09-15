@@ -10,3 +10,8 @@
 	path = integration/submodules/dvp-proxy
 	url = git@github.com:minvws/nl-mgo-dvp-proxy-private.git
 	branch = develop
+[submodule "load"]
+	path = integration/submodules/load
+	url = git@github.com:minvws/nl-mgo-localization-private.git
+	branch = develop
+
