@@ -1,4 +1,9 @@
 name: Local regression testing
+
+concurrency:
+  group: local-regression-testing-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   workflow_dispatch:
   schedule:
@@ -8,45 +13,62 @@ on:
       - main
       - develop
     paths:
-      - 'regression-tests/**'
-      - 'integration/**'
+      - "regression-tests/**"
+      - "integration/**"
   pull_request:
-    types: [ opened, synchronize, reopened ]
+    types: [opened, synchronize, reopened]
 
 jobs:
   build:
+    name: Setup integration and run tests
     runs-on: ubuntu-24.04
-
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v5
         with:
           submodules: true
           token: ${{ secrets.REPO_READ_ONLY_TOKEN }}
 
-      - name: NPM configuration
+      - name: Cleanup runner
+        uses: ./.github/actions/cleanup-runner
+
+      - name: Configure NPM/GitHub secrets
         run: |
           echo "//npm.pkg.github.com/:_authToken=${{ secrets.REPO_READ_ONLY_TOKEN }}" > ~/.npmrc
-          
-      - name: Prepare docker-results directory
+          echo "${{ secrets.REPO_READ_ONLY_TOKEN }}" > ~/.github_token
+
+      - name: Set UID/GID environment variables
+        run: |
+          echo "NEW_UID=$(id -u)" >> $GITHUB_ENV
+          echo "NEW_GID=$(id -g)" >> $GITHUB_ENV
+
+      - name: Prepare test results directory
         run: |
           mkdir -p docker-results
           sudo chmod -R 777 docker-results
         working-directory: regression-tests
 
-      - name: Build application
-        run: |
-          make NEW_GID=$(id -g) NEW_UID=$(id -u) BUILD_PROGRESS=plain build
+      - name: Build Docker services
+        env:
+          COMPOSER_AUTH: '{"github-oauth": {"github.com": "${{ secrets.REPO_READ_ONLY_TOKEN }}"}}'
+          DOCKER_BUILDKIT: 1
+          COMPOSE_DOCKER_CLI_BUILD: 1
+          COMPOSE_FILE: "docker-compose.yml:docker-compose.ci.yml"
+          BUILD_PROGRESS: "plain"
+        run: make -e build
         working-directory: integration
 
-      - name: Run application
+      - name: Start Docker services
         env:
           HTACCESS_USER: ${{secrets.HTACCESS_USER}}
           HTACCESS_PASSWORD: ${{secrets.HTACCESS_PASSWORD}}
         run: make start
         working-directory: integration
 
-      - name: Run Robot Framework Tests
+      - name: Prune Docker
+        run: docker system prune -af --volumes
+
+      - name: Execute Robot Framework tests
         env:
           HTACCESS_USER: ${{secrets.HTACCESS_USER}}
           HTACCESS_PASSWORD: ${{secrets.HTACCESS_PASSWORD}}
@@ -54,20 +76,20 @@ jobs:
         run: ./runtests-in-docker.sh
         working-directory: regression-tests
 
-      - name: Collect Docker Logs on Failure
+      - name: Dump Docker logs on failure
         if: failure() && endsWith(github.repository, '-private')
         run: docker compose logs --timestamps
         working-directory: integration
-          
-      - name: Test Results on Integration
+
+      - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: integration-test-results
           path: regression-tests/docker-results/
 
-      - name: Publish Chrome results summary to GitHub
-        uses: minvws/nl-rdo-github-action-robotframework-test-summary@0.4.3
+      - name: Publish Robot Framework summary
+        uses: minvws/action-robotframework-summary@v1.0.0
         if: always()
         with:
-          output_file: 'regression-tests/docker-results/output.xml'
+          output_file: "regression-tests/docker-results/output.xml"

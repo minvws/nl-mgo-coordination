@@ -48,11 +48,9 @@ services:
         - npmrc
     volumes:
       - './submodules/max:/src'
-      - '/src/.venv'
       - './docker/max/clients.json:/src/clients.json'
       - './docker/max/login_methods.json:/src/login_methods.json'
-      - './docker/max/max.conf.example:/src/max.conf'
-      - './docker/max/vad.conf.example:/src/vad.conf'
+      - './docker/max/app.conf.example:/src/app.conf'
       - '/src/node_modules'
       - '/src/static/assets'
       - './docker/max/version.json:/src/static/version.json'
@@ -65,16 +63,20 @@ services:
         condition: service_completed_successfully
       brp:
         condition: service_started
+      cbp:
+        condition: service_healthy
     ports:
       - '8006:8006'
     networks:
       - max-public
       - max-internal
+      - client-sync
     healthcheck:
       test: [ "CMD", "curl", "--fail", "--insecure", "https://localhost:8006/health" ]
       interval: 10s
       timeout: 5s
       retries: 3
+
   prs:
     build:
       context: ./submodules/prs
@@ -84,7 +86,7 @@ services:
         NEW_GID: ${NEW_GID:-1000}
     volumes:
       - './submodules/prs:/src'
-      - ./docker/prs/app.conf:/src/app.conf
+      - ./docker/prs/app.conf.example:/src/app.conf
       - 'max-secrets:/var/run/secrets'
       - 'prs-secrets:/secrets'
     depends_on:
@@ -104,7 +106,7 @@ services:
       - max-internal
       - dva-demo
   brp:
-    image: ghcr.io/brp-api/personen-mock:2.3.0-latest
+    image: ghcr.io/brp-api/personen-mock:2.7.0-latest
     environment:
       - ASPNETCORE_ENVIRONMENT=Release
       - ASPNETCORE_URLS=http://+:5010
@@ -162,7 +164,7 @@ services:
       - APP_PORT=8801
     volumes:
       - './submodules/dvp-proxy/services/proxy:/src'
-      - './docker/dvp-proxy/app.conf:/src/app.conf'
+      - './docker/dvp-proxy/app.conf.example:/src/app.conf'
       - 'max-secrets:/src/max-secrets'
     networks:
       - max-public
@@ -225,7 +227,70 @@ services:
       start_period: 30s
       timeout: 10s
 
-      
+  cbp:
+    build:
+      context: ./submodules/cbp/vendor/laravel/sail/runtimes/8.3
+      dockerfile: Dockerfile
+      args:
+        WWWGROUP: '${NEW_GID-1000}'
+    image: sail-8.3/app
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    ports:
+      - 8008:80
+    environment:
+      WWWUSER: '${NEW_UID:-1000}'
+      LARAVEL_SAIL: '1'
+      IGNITION_LOCAL_SITES_PATH: '${PWD}'
+      APP_ENV: "local"
+      SKIP_AUTHENTICATION: 'true'
+    volumes:
+      - './submodules/cbp:/var/www/html/'
+    networks:
+      - client-sync
+    depends_on:
+      - cbp-pgsql
+      - cbp-mailpit
+    healthcheck:
+      test: [ "CMD", "curl", "--fail", "http://localhost/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  cbp-pgsql:
+    image: 'postgres:15'
+    ports:
+      - '5433:5432'
+    environment:
+      PGPASSWORD: secret
+      POSTGRES_DB: cbp_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - 'cbp-pgsql:/var/lib/postgresql/data'
+      - './submodules/cbp/vendor/laravel/sail/database/pgsql/create-testing-database.sql:/docker-entrypoint-initdb.d/10-create-testing-database.sql'
+    networks:
+      - client-sync
+    healthcheck:
+      test:
+        - CMD
+        - pg_isready
+        - '-q'
+        - '-d'
+        - 'cbp_db'
+        - '-U'
+        - 'postgres'
+      retries: 3
+      timeout: 5s
+
+  cbp-mailpit:
+    image: 'axllent/mailpit:latest'
+    ports:
+      - '1025:1025'
+      - '8025:8025'
+    networks:
+      - client-sync
+
 networks:
   max-public:
     driver: bridge
@@ -235,11 +300,14 @@ networks:
     driver: bridge
   load:
     driver: bridge
+  client-sync:
+    driver: bridge
 
 volumes:
   max-secrets:
   prs-secrets:
   postgres_data:
+  cbp-pgsql:
 
 secrets:
   npmrc:

@@ -1,6 +1,4 @@
-
-# This is the coordination repository for the MGO project.
-
+# This is the coordination repository for the MGO project
 
 ## Disclaimer
 
@@ -21,16 +19,41 @@ The code examples are only meant to help understand concepts and demonstrate pos
 By using or referencing this code, you acknowledge that you do so at your own
 risk and that the authors assume no liability for any consequences of its use.
 
-# Environment setup
+## Services Overview
+
+- [DVP-Proxy](https://github.com/minvws/nl-mgo-dvp-proxy-private?tab=readme-ov-file)
+- [DVA-Mock](https://github.com/minvws/nl-mgo-dva-mock-private?tab=readme-ov-file)
+- [LOAD](https://github.com/minvws/nl-mgo-localization-private?tab=readme-ov-file)
+- [VAD](https://github.com/minvws/nl-mgo-max-vad-private?tab=readme-ov-file)
+- [VAD Clients manager (CBP)](https://github.com/minvws/nl-mgo-vad-clients-manager-private?tab=readme-ov-file)
+- [Max-core](https://github.com/minvws/irealisatie-max-core?tab=readme-ov-file)
+
+## Environment setup
+
 In this repository, the End-to-End tests are being maintained. In order, to set up your environment
 and contribute to the tests, please read further in the [README under regression-tests](regression-tests/README.md).
 
-# Regression Tests Runs
-| Nightly Test Run                   | Status                                             |
-|------------------------------------|----------------------------------------------------|
-| Test Run against Test env          | [![Morning Run against Test environment](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/morning-on-test.yml/badge.svg?branch=develop)](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/morning-on-test.yml) |
-| Test Run against Acc env           | [![Morning Run against Acc environment](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/morning-on-acc.yml/badge.svg?branch=develop)](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/morning-on-acc.yml) |
-| Test Run on integration on develop | [![Regression Testing on Integration](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/local-regression-testing.yml/badge.svg)](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/local-regression-testing.yml) |
+## Regression Tests Runs
+
+| Nightly Test Run                   | Status                                                                                                                                                                                                                                                                   |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Test Run against Test env          | [![Morning Run against Test environment](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/morning-on-test.yml/badge.svg?branch=develop)](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/morning-on-test.yml)             |
+| Test Run against Acc env           | [![Morning Run against Acc environment](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/morning-on-acc.yml/badge.svg?branch=develop)](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/morning-on-acc.yml)                |
+| Test Run on integration on develop | [![Regression Testing on Integration](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/local-regression-testing.yml/badge.svg)](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/local-regression-testing.yml)             |
 | Test Run on integration on main    | [![Regression Testing on Integration](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/local-regression-testing.yml/badge.svg?branch=main)](https://github.com/minvws/nl-mgo-coordination-private/actions/workflows/local-regression-testing.yml) |
-| Test Run on Web Test env           | [![Morning on Test e2e Tests](https://github.com/minvws/nl-mgo-app-web-private/actions/workflows/morning-test-e2e.yml/badge.svg)](https://github.com/minvws/nl-mgo-app-web-private/actions/workflows/morning-test-e2e.yml) |
-| End to end on iOS                  | [![Thursday night run Test environment](https://github.com/minvws/nl-mgo-app-ios-private/actions/workflows/e2e.yml/badge.svg?branch=main)](https://github.com/minvws/nl-mgo-app-ios-private/actions/workflows/e2e.yml) |
+| Test Run on Web Test env           | [![Morning on Test e2e Tests](https://github.com/minvws/nl-mgo-app-web-private/actions/workflows/morning-test-e2e.yml/badge.svg)](https://github.com/minvws/nl-mgo-app-web-private/actions/workflows/morning-test-e2e.yml)                                               |
+| iOS e2e Tests                      | [![Thursday night run Test environment](https://github.com/minvws/nl-mgo-app-ios-private/actions/workflows/e2e.yml/badge.svg?branch=main)](https://github.com/minvws/nl-mgo-app-ios-private/actions/workflows/e2e.yml)                                                   |
+| Android e2e Tests                  | [![Thursday night run Test environment](https://github.com/minvws/nl-mgo-app-android-private/actions/workflows/e2e.yml/badge.svg?branch=main)](https://github.com/minvws/nl-mgo-app-android-private/actions/workflows/e2e.yml)                                           |
+
+## Contributing
+
+### Commit Guidelines
+
+This project follows the **[Conventional Commits](https://www.conventionalcommits.org/)** specification for commit messages.
+To help enforce this, a **[pre-commit](https://pre-commit.com/)** configuration is included that can validate your commit messages.
+
+To enable the commit message validation hook, run:
+
+```bash
+pre-commit install --install-hooks
+```

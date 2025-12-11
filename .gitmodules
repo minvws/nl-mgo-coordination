@@ -14,4 +14,7 @@
 	path = integration/submodules/load
 	url = git@github.com:minvws/nl-mgo-localization-private.git
 	branch = develop
-
+[submodule "integration/submodules/cbp"]
+	path = integration/submodules/cbp
+	url = git@github.com:minvws/nl-mgo-vad-clients-manager-private.git
+	branch = develop

@@ -1,0 +1,62 @@
+[app]
+name=VAD
+environment = development
+external_base_url = https://host.docker.internal:8006
+loglevel = debug
+user_authentication_sym_key = 0000000000000000000000000000000000000000000000000000000000000000
+
+[cache]
+cache_driver = redis
+redis_host = redis
+redis_port = 6379
+redis_check_hostname = True
+
+[jwe]
+jwe_sign_priv_key_path = secrets/nl-rdo-max-private.key
+jwe_sign_crt_path = secrets/nl-rdo-max-private.crt
+
+[uvicorn]
+host = 0.0.0.0
+port = 8006
+reload = True
+use_ssl = True
+base_dir = secrets/ssl
+cert_file = server.crt
+key_file = server.key
+reload_includes = *.conf
+
+[oidc]
+certificates_directory = secrets/jwks-certs
+rsa_private_key = secrets/oidc/selfsigned.key
+rsa_private_key_crt = secrets/oidc/selfsigned.crt
+issuer = https://max:8006
+clients_file = clients.json
+
+subject_id_hash_salt = somesalt
+
+[saml]
+base_issuer = localhost:8007
+
+[auth_session]
+enabled = True
+enforce_secure_cookie = True
+secret_key = 0000000000000000000000000000000000000000000000000000000000000000
+cache_ttl_seconds = 70
+cookie_expiry_offset_seconds = 10
+
+[cbp_source]
+type=http
+base_url=http://cbp/api/v1
+
+[cbp_cache]
+filepath=cache/cbp/clients.json
+
+[prs]
+prs_repository=mock
+repo_base_url=http://prs:6502
+organisation_id=123
+
+[brp]
+mock_brp=False
+base_url=http://brp:5010/haalcentraal/api/brp
+api_key=

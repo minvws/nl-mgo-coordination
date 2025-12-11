@@ -75,7 +75,7 @@ service_name=Proxy
 collector_grpc_url=http://jaeger:4317
 
 [oidc]
-client_id=e7b8a6f4-8c3e-4f6a-9b8e-3f8b6a7e8c3e
+client_id=006fbf34-a80b-4c81-b6e9-593600675fb1
 callback_endpoint=/oidc/callback
 state_secret_path=secrets/oidc-state.key
 client_assertion_jwt_pvt_key_path=max-secrets/clients/dvp-proxy-client/dvp-proxy-client.key

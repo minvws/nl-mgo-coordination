@@ -6,7 +6,12 @@ submodules-init: ## Initialize all submodules and ensure they are checked out re
 
 submodules-update: ## Sync submodule URLs and update them to the latest commit from their remote branches
 	git submodule sync --recursive && git submodule update --recursive --remote
-	
+
+submodules-reset: ## Reset all submodules to their committed state
+	git submodule sync --recursive
+	git submodule update --init --recursive --force
+	git submodule foreach --recursive 'git reset --hard'
+
 help: ## Display available commands
 	echo "Available make commands:"
 	echo

@@ -1,0 +1,50 @@
+name: "Validate PR Description"
+description: "Validates that the pull request description follows the pull request template."
+
+runs:
+  using: "composite"
+  steps:
+    - name: Configure PR template
+      shell: bash
+      run: |
+        echo "TEMPLATE_PATH=.github/pull_request_template.md" >> "$GITHUB_ENV"
+
+    - name: Fetch branch-specific PR template
+      shell: bash
+      run: |
+        echo "Fetching PR template from $TEMPLATE_PATH"
+        if [ ! -f "$TEMPLATE_PATH" ]; then
+          echo "ERROR: Branch-specific template not found at $TEMPLATE_PATH"
+          exit 1
+        fi
+        cp "$TEMPLATE_PATH" pr_template.txt
+
+    - name: Check if PR has a description
+      shell: bash
+      run: |
+        PR_BODY=$(jq --raw-output ".pull_request.body // empty" "$GITHUB_EVENT_PATH")
+        if [ -z "$PR_BODY" ]; then
+          echo "ERROR: PR description is missing."
+          exit 1
+        fi
+        echo "$PR_BODY" > pr_body.txt
+
+    - name: Compare PR body to templates
+      shell: bash
+      run: |
+        function normalize_and_compare() {
+          local body_file="$1"
+          local template_file="$2"
+          sed '/^\s*$/d' "$body_file" | sed 's/[[:space:]]//g' > body_clean.txt
+          sed '/^\s*$/d' "$template_file" | sed 's/[[:space:]]//g' > template_clean.txt
+          if cmp -s body_clean.txt template_clean.txt; then
+            echo "ERROR: PR description matches the template too closely. Please provide a meaningful description."
+            exit 1
+          else
+            echo "PR description differs sufficiently from the template."
+          fi
+        }
+        normalize_and_compare pr_body.txt pr_template.txt
+
+    - name: Ensure all checkboxes are checked
+      uses: mheap/require-checklist-action@v2

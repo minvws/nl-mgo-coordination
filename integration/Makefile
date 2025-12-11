@@ -7,8 +7,14 @@ all: help
 
 
 build: ## Build the docker images
-	./scripts/distribute_signing_keys.sh
-	docker compose --progress "${BUILD_PROGRESS}" build --build-arg NEW_UID=${NEW_UID} --build-arg NEW_GID=${NEW_GID} 
+	./scripts/pre-build.sh
+	docker compose --progress "${BUILD_PROGRESS}" build --build-arg NEW_UID=${NEW_UID} --build-arg NEW_GID=${NEW_GID}
+
+clean-build: ## First remove any volumes and then build without cache
+	docker compose down --volumes
+	rm -f submodules/max/cache/cbp/clients.json
+	./scripts/pre-build.sh
+	docker compose --progress "${BUILD_PROGRESS}" build --no-cache --build-arg NEW_UID=${NEW_UID} --build-arg NEW_GID=${NEW_GID}
 
 start: ## Start the docker containers
 # We do this because we want to make use of the docker compose depends_on feature for the load db so we can run the migrations correctly

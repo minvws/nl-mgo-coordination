@@ -1,0 +1,78 @@
+name: CI - Regression tests
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+  push:
+    branches: ["main"]
+    paths:
+      - "regression-tests/**"
+  workflow_dispatch:
+
+env:
+  PYTHON_VERSION: ">=3.12 <4.0"
+
+jobs:
+  lint-robocop:
+    name: Lint Robocop
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: regression-tests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Install Poetry
+        run: pipx install poetry
+      - name: Setup Python
+        uses: actions/setup-python@v6.0.0
+        with:
+          python-version-file: regression-tests/pyproject.toml
+          cache: poetry
+      - name: Install robocop
+        run: poetry install --only robocop
+      - name: Run robocop
+        run: make lint-robocop
+
+  lint-ruff:
+    name: Lint Ruff
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+        working-directory: regression-tests
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+      - name: Install Poetry
+        run: pipx install poetry
+      - name: Setup Python
+        uses: actions/setup-python@v6.0.0
+        with:
+          python-version-file: regression-tests/pyproject.toml
+          cache: poetry
+      - name: Install dependencies
+        run: poetry install --only ruff
+      - name: Run robocop
+        run: make lint-ruff
+
+  run-tests-against-test:
+    name: Run tests against Test
+    uses: ./.github/workflows/called-regression-testing.yml
+    with:
+      test_environment: test
+      test_tag: test
+    secrets:
+      user: ${{secrets.HTACCESS_USER}}
+      password: ${{secrets.HTACCESS_PASSWORD}}
+
+  run-tests-against-acc:
+    name: Run tests against Acc
+    uses: ./.github/workflows/called-regression-testing.yml
+    with:
+      test_environment: acc
+      test_tag: acc
+    secrets:
+      user: ${{secrets.HTACCESS_USER}}
+      password: ${{secrets.HTACCESS_PASSWORD}}

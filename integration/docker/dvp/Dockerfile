@@ -19,12 +19,12 @@ RUN sed -i 's|ErrorLog .*|ErrorLog /dev/stderr|' /etc/apache2/apache2.conf \
 RUN apt-get update && apt-get install -y --no-install-recommends \
     zip \
     unzip \
-    && curl -fsSL https://deb.nodesource.com/setup_18.x | bash - \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
     && apt-get install -y nodejs \
     && curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer --version=2.8.2 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g npm@10.9.0
+RUN npm install -g npm@11.6.3
 
 COPY ./services/dvp /var/www/html
 

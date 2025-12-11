@@ -1,0 +1,11 @@
+services:
+  max:
+    build:
+      ssh:
+        - default
+    volumes:
+      - type: bind
+        source: '${SSH_AUTH_SOCK_VOLUME:-${SSH_AUTH_SOCK}}'
+        target: /ssh-agent
+    environment:
+      - SSH_AUTH_SOCK=/ssh-agent

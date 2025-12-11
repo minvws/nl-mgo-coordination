@@ -11,8 +11,7 @@
         ],
         "pubkey_type": "RSA",
         "client_public_key_path": "/secrets/clients/vad-test-client/vad-test-client.pub",
-        "client_authentication_method": "none",
-        "content_type": "application/json"
+        "client_authentication_method": "none"
     },
     "e7b8a6f4-8c3e-4f6a-9b8e-3f8b6a7e8c3e": {
         "name": "dvp proxy client",
@@ -26,7 +25,6 @@
         ],
         "pubkey_type": "RSA",
         "client_public_key_path": "/secrets/clients/dvp-proxy-client/dvp-proxy-client.pub",
-        "client_authentication_method": "private_key_jwt",
-        "content_type": "application/json"
+        "client_authentication_method": "private_key_jwt"
     }
 }

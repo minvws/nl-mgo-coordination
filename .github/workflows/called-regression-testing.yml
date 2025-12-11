@@ -27,10 +27,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Python
-        uses: actions/setup-python@v5.6.0
+        uses: actions/setup-python@v6.0.0
         with:
           python-version: 3.13.5
 
@@ -75,7 +75,7 @@ jobs:
           path: regression-tests/results/
 
       - name: Publish Chrome results summary to GitHub
-        uses: minvws/nl-rdo-github-action-robotframework-test-summary@0.4.3
+        uses: minvws/action-robotframework-summary@v1.0.0
         if: always()
         with:
           output_file: 'regression-tests/results/output.xml'

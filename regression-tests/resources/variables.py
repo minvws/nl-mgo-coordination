@@ -14,25 +14,28 @@ def write_to_console(s):
 
 global_variables = {
     "local": {
-        "dvp_proxy": "localhost:8801",
-        "host": "localhost:9000",
-        "max": "localhost:8006",
-        "load": "localhost:8808",
-        "user_name": "Frouke Jansen",
+        "DVP_PROXY": "localhost:8801",
+        "HOST": "localhost:9000",
+        "MAX": "localhost:8006",
+        "LOAD": "localhost:8808",
+        "USER_NAME": "Frouke Jansen",
+        "CBP": "localhost:8008",
     },
     "test": {
-        "dvp_proxy": "dvp-proxy.test.mgo.irealisatie.nl",
-        "host": "localhost:9000",
-        "max": "vad.test.mgo.irealisatie.nl",
-        "load": "lo-ad.test.mgo.irealisatie.nl",
-        "user_name": "Jan van Jansen",
+        "DVP_PROXY": "dvp-proxy.test.mgo.irealisatie.nl",
+        "HOST": "localhost:9000",
+        "MAX": "vad.test.mgo.irealisatie.nl",
+        "LOAD": "lo-ad.test.mgo.irealisatie.nl",
+        "USER_NAME": "Jan van Jansen",
+        "CBP": "https://cbp.test.mgo.irealisatie.nl",
     },
     "acc": {
-        "dvp_proxy": "dvp-proxy.acc.mgo.irealisatie.nl",
-        "host": "localhost:9000",
-        "max": "vad.acc.mgo.irealisatie.nl",
-        "load": "lo-ad.acc.mgo.irealisatie.nl",
-        "user_name": "Jan van Jansen",
+        "DVP_PROXY": "dvp-proxy.acc.mgo.irealisatie.nl",
+        "HOST": "localhost:9000",
+        "MAX": "vad.acc.mgo.irealisatie.nl",
+        "LOAD": "lo-ad.acc.mgo.irealisatie.nl",
+        "USER_NAME": "Jan van Jansen",
+        "CBP": "https://cbp.acc.mgo.irealisatie.nl",
     },
 }
 
@@ -49,7 +52,7 @@ def get_variables():
     write_to_console(f"environment is {env}")
     gv = global_variables.get(env, global_variables["local"]).copy()
 
-    config_keys = ["dvp_proxy", "max", "load"]
+    config_keys = ["DVP_PROXY", "MAX", "LOAD"]
     if env != "local":
         for key in config_keys:
             gv[key] = f"{USER}:{PASSWORD}@{gv[key]}"

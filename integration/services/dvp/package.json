@@ -6,10 +6,10 @@
         "dev": "vite"
     },
     "devDependencies": {
-        "@tailwindcss/postcss": "^4.1.11",
-        "@tailwindcss/vite": "^4.1.11",
-        "autoprefixer": "^10.4.21",
-        "laravel-vite-plugin": "^1.3",
+        "@tailwindcss/postcss": "^4.1.17",
+        "@tailwindcss/vite": "^4.1.17",
+        "autoprefixer": "^10.4.22",
+        "laravel-vite-plugin": "^2.0",
         "tailwindcss": "^4.1.6"
     }
 }

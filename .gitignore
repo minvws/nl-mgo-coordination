@@ -4,5 +4,8 @@ output-local
 output.xml
 log.html
 /regression-tests/results/
+/regression-tests/docker-results/
 *.pyc
 .venv
+.DS_Store
+.env

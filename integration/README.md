@@ -12,7 +12,7 @@ This platform is used for development and integration testing.
 - [Service composition](#service-composition)
 - [Installation](#installation)
   - [Prerequisites](#prerequisites)
-  - [Set-up](#set-up)
+  - [Setup Guide](#setup-guide)
 - [Demo](#demo)
   - [DVP Functionality Demonstrated](#dvp-functionality-demonstrated)
   - [DVA](#dva)
@@ -25,19 +25,19 @@ This platform is used for development and integration testing.
 ## Definitions
 
 | Abbreviation | Term                             | Description                                                                                                                                        |
-| ------------ | -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **BSN**      | BurgerServiceNummer              | Dutch equivalent of a Social Security Number, assigned to every Dutch citizen.                                                                     |
-| **PII**      | Personally Identifiable Info     | Information that can be used to identify a person.                                                                                                 |
-| **PDN**      | Pseudonym                        | A deterministic, organisation-specific pseudonym for a PII (Personally Identifiable Information).                                                  |
-| **RID**      | Reference ID                     | A unique identifier that can be used to retrieve a pseudonym                                                                                       |
-| **BRP**      | BasisRegistratie Personen        | Dutch Personal Records Database. Contains information about Dutch citizens.                                                                        |
-| **DigiD**    | Digitale Identiteit              | Dutch digital identity system. Used to authenticate Dutch citizens on various government websites based on their BSN.                              |
-| **VAD**      | Vertrouwde AuthenticatieDienst   | Trusted Authentication Service. Used to describe the interconnected services that facilitate DigiD login, BRP data enrichment and Pseudonymization |
-| **DVA**      | DienstVerlener Aanbieder         | Service Provider Provider. A service that provides services to a service provider (usually a healthcare provider)                                  |
-| **DVP**      | DienstVerlener Persoon           | Service Provider Person. A service (usually a PGO) that provides services to a person.                                                             |
-| **TVS**      | ToegangsVerlenings service       | Access providing service. A service that provides multiple login methods that all lead to PII for a user  that is logging in.                      |
-| **MAX**      | Multiple Authentication Exchange | A service that acts as a bridge between the authentication server (TVS) and the OIDC service. In this proof of concept TVS is mocked by MAX.       |
-| **VAD**     | Vertrouwde AuthenticatieDienst     | A module within MAX that provides extended user information together with a [RID](#definitions) and [PDN](#definitions) allowing external healthcare systems to retrieve user information without sharing privacy sensitive authentication identifiers. In the end VAD will become an application on it's own using MAX as base framework to operate on.                              |
+|-----------| -------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **BSN**   | BurgerServiceNummer              | Dutch equivalent of a Social Security Number, assigned to every Dutch citizen.                                                                     |
+| **PII**   | Personally Identifiable Info     | Information that can be used to identify a person.                                                                                                 |
+| **PDN**   | Pseudonym                        | A deterministic, organisation-specific pseudonym for a PII (Personally Identifiable Information).                                                  |
+| **RID**   | Reference ID                     | A unique identifier that can be used to retrieve a pseudonym                                                                                       |
+| **BRP**   | BasisRegistratie Personen        | Dutch Personal Records Database. Contains information about Dutch citizens.                                                                        |
+| **DigiD** | Digitale Identiteit              | Dutch digital identity system. Used to authenticate Dutch citizens on various government websites based on their BSN.                              |
+| **VAD**   | Vertrouwde AuthenticatieDienst   | Trusted Authentication Service. Used to describe the interconnected services that facilitate DigiD login, BRP data enrichment and Pseudonymization |
+| **DVA**   | DienstVerlener Aanbieder         | Service Provider Provider. A service that provides services to a service provider (usually a healthcare provider)                                  |
+| **DVP**   | DienstVerlener Persoon           | Service Provider Person. A service (usually a PGO) that provides services to a person.                                                             |
+| **TVS**   | ToegangsVerlenings service       | Access providing service. A service that provides multiple login methods that all lead to PII for a user  that is logging in.                      |
+| **MAX**   | Multiple Authentication Exchange | A service that acts as a bridge between the authentication server (TVS) and the OIDC service. In this proof of concept TVS is mocked by MAX.       |
+| **VAD**   | Vertrouwde AuthenticatieDienst   | A module within MAX that provides extended user information together with a [RID](#definitions) and [PDN](#definitions) allowing external healthcare systems to retrieve user information without sharing privacy sensitive authentication identifiers. In the end VAD will become an application on it's own using MAX as base framework to operate on.                              |
 
 ## Overview
 
@@ -98,11 +98,46 @@ make submodules-init
 In order to be able to pull the npm assets, you need to provide the GITHUB TOKEN.
 You can do that by adding your GITHUB_TOKEN to your `~/.npmrc`.
 Add to your `~/.npmrc` file, the following:
+
 ```bash
 //npm.pkg.github.com/:_authToken=<YOUR_GITHUB_TOKEN>
 ```
 
-#### 3. Navigate to the Integration Folder
+#### 3. Configure Composer authentication
+
+Create the following file: `~/.config/composer/auth.json` with the following content:
+
+```json
+{
+    "github-oauth": {
+        "github.com": "<YOUR_GITHUB_TOKEN>"
+    }
+}
+```
+
+#### 4. Enable SSH agent forwarding
+
+Why: Private dependencies (e.g., GitHub repositories accessed via `git@github.com`) are required during the Docker build.
+In Docker a `--mount=type=ssh` is used, so your local SSH agent must be forwarded into the build.
+
+```sh
+# Example:
+eval "$(ssh-agent -s)"
+ssh-add ~/.ssh/id_ed25519   # or your key path
+ssh-add -l                  # verify key is loaded
+```
+
+Note that on macOS, the above `eval` command is not needed. Just make sure to add the key to your path, every time the host machine is restarted.
+
+#### 5. Add .env file
+Copy the content of the [.env.example](integration/.env.example) file to a `.env` file.
+
+We have added the `SSH_AUTH_SOCK_VOLUME` environment variable, used in the [docker-compose.override.yml](integration/docker-compose.override.yml),
+to allow overriding the default `SSH_AUTH_SOCK` environment variable, in cases where the default socket does not work, such as for some macOS users.
+On macOS, the SSH_AUTH socket may reside under `/private/` folders, and is thus managed by the
+Apple launched system. Docker Desktop on macOS, however, doesn't support bind-mounting on these socket paths.
+
+#### 6. Navigate to the Integration Folder
 
 Change to the working directory, `integration`, where the necessary configurations are located:
 
@@ -110,7 +145,7 @@ Change to the working directory, `integration`, where the necessary configuratio
 cd integration
 ```
 
-#### 4. Build Docker Containers
+#### 7. Build Docker Containers
 
 Next, build the Docker containers for the project:
 
@@ -118,7 +153,12 @@ Next, build the Docker containers for the project:
 make build
 ```
 
-#### 4. Start the Services
+> ⚠️ **Clean build:** If you want to make sure you have a clean build, you might want to try make clean-build instead.
+This ensures that the containers are stopped and any volumes are removed. Next, it performs a build.
+The build step performs the same actions as the `make build` step, but this time the images are built from scratch using `--no-cache`.
+
+
+#### 8. Start the Services
 
 Finally, start the docker services:
 

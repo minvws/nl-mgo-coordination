@@ -1,8 +1,7 @@
 *** Settings ***
 Documentation       Adding All libraries in one file, so we only need to import that file
-
-Library             DateTime
 Library             Collections
+Library             DateTime
 Library             String
 Library             Browser
 Library             RequestsLibrary

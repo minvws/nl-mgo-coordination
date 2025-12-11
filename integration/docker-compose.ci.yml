@@ -1,0 +1,9 @@
+services:
+  max:
+    build:
+      secrets:
+        - github_token
+
+secrets:
+  github_token:
+    file: ~/.github_token

@@ -2,7 +2,6 @@
   {
     "name": "digid_mock",
     "logo": "static/img/digid-logo.svg",
-    "text": "Inloggen met DigiD mock",
-    "type": "specific"
+    "text": "Inloggen met DigiD mock"
   }
 ]

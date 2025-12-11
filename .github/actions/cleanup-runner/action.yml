@@ -1,0 +1,35 @@
+name: "Cleanup runner"
+description: "Aggressive cleanup of non-used developer tools. CodeQL and Docker cleanup are removed since they are slow and don't save much space."
+
+runs:
+  using: "composite"
+  steps:
+    - name: Cleanup runner
+      shell: bash
+      run: |
+        # Remove Java (JDKs)
+        sudo rm -rf /usr/lib/jvm
+
+        # Remove .NET SDKs
+        sudo rm -rf /usr/share/dotnet
+
+        # Remove Swift toolchain
+        sudo rm -rf /usr/share/swift
+
+        # Remove Haskell (GHC)
+        sudo rm -rf /usr/local/.ghcup
+
+        # Remove Android SDKs
+        sudo rm -rf /usr/local/lib/android
+
+        # Remove Microsoft/Edge and Google Chrome builds
+        sudo rm -rf /opt/microsoft /opt/google
+
+        # Remove Azure CLI
+        sudo rm -rf /opt/az
+
+        # Remove PowerShell
+        sudo rm -rf /usr/local/share/powershell
+
+        # Show cleanup status
+        df -h
